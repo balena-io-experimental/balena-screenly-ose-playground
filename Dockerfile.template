@@ -1,0 +1,20 @@
+FROM resin/%%RESIN_MACHINE_NAME%%-debian:jessie
+
+WORKDIR /usr/src/app
+ENV INITSYSTEM on
+
+RUN apt-get update && \
+    apt-get -y install build-essential git-core net-tools python-pip python-netifaces python-simplejson python-imaging python-dev sqlite3 libffi-dev libssl-dev && \
+    apt-get clean
+
+# Install Python requirements
+ADD requirements.txt /tmp/requirements.txt
+RUN pip install -r /tmp/requirements.txt
+
+# Install config file
+COPY ansible/roles/screenly/files/screenly.conf /root/.screenly/
+
+# Copy in code base
+COPY . ./
+
+CMD ["bash", "start.sh"]
